@@ -3,11 +3,14 @@ package net.dohaw.play.healercreator.files;
 import net.dohaw.play.healercreator.HealerCreator;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.*;
 
 public class ConfigManager {
 
@@ -55,16 +58,48 @@ public class ConfigManager {
         }
     }
 
-    public void addHealerToConfig(String healerName, Location<World> healerLocation){
-        config.getNode("Villager", healerName, "Location", "World").setValue(healerLocation.getExtent().getName());
-        config.getNode("Villager", healerName, "Location", "X").setValue(healerLocation.getBlockX());
-        config.getNode("Villager", healerName, "Location", "Y").setValue(healerLocation.getBlockY());
-        config.getNode("Villager", healerName, "Location", "Z").setValue(healerLocation.getBlockZ());
+    public void addHealerToConfig(String healerName, Location<World> healerLocation, UUID entityUUID){
+        config.getNode("Healers", healerName, "Location", "World").setValue(healerLocation.getExtent().getName());
+        config.getNode("Healers", healerName, "Location", "X").setValue(healerLocation.getBlockX());
+        config.getNode("Healers", healerName, "Location", "Y").setValue(healerLocation.getBlockY());
+        config.getNode("Healers", healerName, "Location", "Z").setValue(healerLocation.getBlockZ());
+        config.getNode("Healers", healerName, "UUID").setValue(entityUUID.toString());
         saveConfig();
     }
 
+
+    public List<Location<World>> getAllHealerLocations(){
+        Map<Object,? extends CommentedConfigurationNode> section = config.getNode("Healers").getChildrenMap();
+        List<Location<World>> healerLocations = new ArrayList<>();
+        for(Object key : section.keySet()){
+            healerLocations.add(getHealerLocation((String) key));
+        }
+        return healerLocations;
+    }
+
+    public Location<World> getHealerLocation(String healerName){
+        World world = Sponge.getServer().getWorld(config.getNode("Healers", healerName, "Location", "World").getString()).get();
+        int x = config.getNode("Healers", healerName, "Location", "X").getInt();
+        int y = config.getNode("Healers", healerName, "Location", "Y").getInt();
+        int z = config.getNode("Healers", healerName, "Location", "Z").getInt();
+        return new Location(world, x, y, z);
+    }
+
+    public Location<World> getHealerLocation(UUID entityUUID){
+        List<Location<World>> allHealerLocations = getAllHealerLocations();
+        for(Location loc : allHealerLocations){
+            Collection<Entity> nearbyEntities = loc.getExtent().getNearbyEntities(loc.getPosition(), 2);
+            for(Entity e : nearbyEntities){
+                if(e.getUniqueId().equals(entityUUID)){
+                    return e.getLocation();
+                }
+            }
+        }
+        return null;
+    }
+
     public boolean isAHealer(String healerName){
-        return config.getNode("Villager", healerName).getValue() != null;
+        return config.getNode("Healers", healerName).getValue() != null;
     }
 
 

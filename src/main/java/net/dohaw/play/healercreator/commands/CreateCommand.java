@@ -14,6 +14,7 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.mutable.DisplayNameData;
 import org.spongepowered.api.data.manipulator.mutable.entity.InvisibilityData;
+import org.spongepowered.api.data.manipulator.mutable.entity.TargetedEntityData;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.EntityTypes;
@@ -63,8 +64,6 @@ public class CreateCommand implements CommandSpecable {
                 }else{
                     src.sendMessage(Text.of("This is already a healer name!"));
                 }
-
-
             }else{
                 src.sendMessage(Chat.colorMsg("Only players can send this command!"));
             }
@@ -87,7 +86,7 @@ public class CreateCommand implements CommandSpecable {
 
         removeNormalGoal(entity);
         setVillagerData(entity, nameOfEntity);
-        cm.addHealerToConfig(nameOfEntity, playerLocation);
+        cm.addHealerToConfig(nameOfEntity, playerLocation, entity.getUniqueId());
 
         return null;
     }
@@ -106,6 +105,10 @@ public class CreateCommand implements CommandSpecable {
         villager.offer(Keys.VANISH_IGNORES_COLLISION, true);
         villager.offer(Keys.DISPLAY_NAME, Text.of(Chat.colorMsg("&7[&eHealer&7] &r" + healerName)));
         villager.offer(Keys.CUSTOM_NAME_VISIBLE, true);
+        villager.offer(Keys.INVULNERABLE, true);
+        villager.offer(Keys.IS_SILENT, true);
+        villager.offer(Keys.INFINITE_DESPAWN_DELAY, true);
+
     }
 
 }

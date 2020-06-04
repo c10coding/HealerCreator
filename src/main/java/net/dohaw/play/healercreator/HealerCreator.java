@@ -3,6 +3,7 @@ package net.dohaw.play.healercreator;
 import com.google.inject.Inject;
 import net.dohaw.play.healercreator.commands.Base;
 import net.dohaw.play.healercreator.files.ConfigManager;
+import net.dohaw.play.healercreator.listeners.VillagerListener;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import org.slf4j.Logger;
@@ -38,10 +39,15 @@ public class HealerCreator {
         this.cm = new ConfigManager(configFile, configManager);
         cm.setup();
         registerCommand();
+        registerListeners();
     }
 
     private void registerCommand(){
         Sponge.getCommandManager().register(this, new Base(this).base(), "healcreator", "hc", "healc");
+    }
+
+    private void registerListeners(){
+        Sponge.getGame().getEventManager().registerListeners(this, new VillagerListener(this));
     }
 
     public ConfigManager getConfigManager(){
