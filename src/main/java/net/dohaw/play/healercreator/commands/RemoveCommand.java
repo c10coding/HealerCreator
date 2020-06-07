@@ -9,8 +9,13 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
+
+import java.util.*;
 
 public class RemoveCommand implements CommandSpecable{
 
@@ -31,15 +36,6 @@ public class RemoveCommand implements CommandSpecable{
                 .build();
     }
 
-    /**
-     * Callback for the execution of a command.
-     *
-     * @param src  The commander who is executing this command
-     * @param args The parsed command arguments for this command
-     * @return the result of executing this command
-     * @throws CommandException If a user-facing error occurs while
-     *                          executing this command
-     */
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) {
         if(src instanceof Player){
@@ -47,12 +43,33 @@ public class RemoveCommand implements CommandSpecable{
                 String nameOfHealer = args.<String>getOne(Text.of("Healer name")).get();
                 if(cm.isAHealer(nameOfHealer)){
 
+                    Location<World> healerLocation = cm.getHealerLocation(nameOfHealer);
+                    Optional<UUID> healerUUID = cm.getHealerUUID(nameOfHealer);
+                    Optional<Entity> entity;
+
+                    if(healerUUID.isPresent()){
+
+                        entity = healerLocation.getExtent().getEntity(healerUUID.get());
+
+                        if(entity.isPresent()){
+                            entity.get().remove();
+                            cm.removeHealerFromConfig(nameOfHealer);
+                            src.sendMessage(Text.of("Deleted wandering healer " + nameOfHealer));
+                        }else{
+                            src.sendMessage(Chat.colorMsg("There was an error removing the healer from the plugin's memory. Please contact the plugin developer!"));
+                        }
+
+                    }else{
+                        src.sendMessage(Chat.colorMsg("There has been an error trying to identify the healer. Please contact the plugin developer!"));
+                        return CommandResult.success();
+                    }
+
                 }else{
                     src.sendMessage(Chat.colorMsg("This is not a valid healer! (Healer names are case-sensitive)"));
                 }
             }
 
         }
-        return null;
+        return CommandResult.success();
     }
 }

@@ -103,7 +103,7 @@ public class CreateCommand implements CommandSpecable {
         villager.offer(Keys.DECAYABLE, false);
         villager.offer(Keys.INFINITE_DESPAWN_DELAY, true);
         villager.offer(Keys.VANISH_IGNORES_COLLISION, true);
-        villager.offer(Keys.DISPLAY_NAME, Text.of(Chat.colorMsg("&7[&eHealer&7] &r" + healerName)));
+        villager.offer(Keys.DISPLAY_NAME, Text.of(Chat.colorMsg("&7[&eWandering Healer&7] &r" + healerName)));
         villager.offer(Keys.CUSTOM_NAME_VISIBLE, true);
         villager.offer(Keys.INVULNERABLE, true);
         villager.offer(Keys.IS_SILENT, true);

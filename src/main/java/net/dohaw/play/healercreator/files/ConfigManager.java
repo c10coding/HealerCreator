@@ -67,6 +67,15 @@ public class ConfigManager {
         saveConfig();
     }
 
+    public void removeHealerFromConfig(String healerName){
+        config.getNode("Healers", healerName).setValue(null);
+        saveConfig();
+    }
+
+    public Optional<UUID> getHealerUUID(String healerName){
+        Optional<UUID> optUUID = Optional.of(UUID.fromString(config.getNode("Healers", healerName, "UUID").getString()));
+        return optUUID;
+    }
 
     public List<Location<World>> getAllHealerLocations(){
         Map<Object,? extends CommentedConfigurationNode> section = config.getNode("Healers").getChildrenMap();

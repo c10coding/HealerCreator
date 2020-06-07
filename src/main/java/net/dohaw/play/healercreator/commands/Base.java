@@ -23,6 +23,8 @@ public class Base implements CommandSpecable {
         return CommandSpec.builder()
                 .permission("healercreator.base")
                 .child(new CreateCommand(plugin).base(), "create")
+                .child(new RemoveCommand(plugin).base(), "remove")
+                .child(new ListHealersCommand(plugin).base(), "list")
                 .executor(this)
                 .build();
     }
